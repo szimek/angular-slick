@@ -48,6 +48,7 @@ angular.module('slick', []).directive('slick', [
         useCSS: '@',
         variableWidth: '@',
         vertical: '@',
+        verticalSwiping: '@',
         prevArrow: '@',
         nextArrow: '@'
       },
@@ -113,6 +114,7 @@ angular.module('slick', []).directive('slick', [
               useCSS: scope.useCSS !== 'false',
               variableWidth: scope.variableWidth === 'true',
               vertical: scope.vertical === 'true',
+              verticalSwiping: scope.verticalSwiping === 'true',
               prevArrow: scope.prevArrow ? $(scope.prevArrow) : void 0,
               nextArrow: scope.nextArrow ? $(scope.nextArrow) : void 0
             });
