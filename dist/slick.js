@@ -48,7 +48,6 @@ angular.module('slick', []).directive('slick', [
         useCSS: '@',
         variableWidth: '@',
         vertical: '@',
-        verticalSwiping: '@',
         prevArrow: '@',
         nextArrow: '@'
       },
@@ -57,7 +56,7 @@ angular.module('slick', []).directive('slick', [
         destroySlick = function () {
           return $timeout(function () {
             var slider;
-            slider = $(element);
+            slider = angular.element(element);
             slider.slick('unslick');
             slider.find('.slick-list').remove();
             return slider;
@@ -66,7 +65,7 @@ angular.module('slick', []).directive('slick', [
         initializeSlick = function () {
           return $timeout(function () {
             var currentIndex, customPaging, slider;
-            slider = $(element);
+            slider = angular.element(element);
             if (scope.currentIndex != null) {
               currentIndex = scope.currentIndex;
             }
@@ -76,13 +75,32 @@ angular.module('slick', []).directive('slick', [
                 index: index
               });
             };
+            slider.on('init', function (sl) {
+              if (attrs.onInit) {
+                scope.onInit();
+              }
+              if (currentIndex != null) {
+                return sl.slideHandler(currentIndex);
+              }
+            });
+            slider.on('afterChange', function (event, slick, currentSlide, nextSlide) {
+              if (currentIndex != null) {
+                scope.$apply(function () {
+                  currentIndex = currentSlide;
+                  return scope.currentIndex = currentSlide;
+                });
+              }
+              if (scope.onAfterChange) {
+                return scope.onAfterChange();
+              }
+            });
             slider.slick({
               accessibility: scope.accessibility !== 'false',
               adaptiveHeight: scope.adaptiveHeight === 'true',
               arrows: scope.arrows !== 'false',
               asNavFor: scope.asNavFor ? scope.asNavFor : void 0,
-              appendArrows: scope.appendArrows ? $(scope.appendArrows) : $(element),
-              appendDots: scope.appendDots ? $(scope.appendDots) : $(element),
+              appendArrows: scope.appendArrows ? angular.element(scope.appendArrows) : slider,
+              appendDots: scope.appendDots ? angular.element(scope.appendDots) : slider,
               autoplay: scope.autoplay === 'true',
               autoplaySpeed: scope.autoplaySpeed != null ? parseInt(scope.autoplaySpeed, 10) : 3000,
               centerMode: scope.centerMode === 'true',
@@ -114,28 +132,8 @@ angular.module('slick', []).directive('slick', [
               useCSS: scope.useCSS !== 'false',
               variableWidth: scope.variableWidth === 'true',
               vertical: scope.vertical === 'true',
-              verticalSwiping: scope.verticalSwiping === 'true',
-              prevArrow: scope.prevArrow ? $(scope.prevArrow) : void 0,
-              nextArrow: scope.nextArrow ? $(scope.nextArrow) : void 0
-            });
-            slider.on('init', function (sl) {
-              if (attrs.onInit) {
-                scope.onInit();
-              }
-              if (currentIndex != null) {
-                return sl.slideHandler(currentIndex);
-              }
-            });
-            slider.on('afterChange', function (event, slick, currentSlide, nextSlide) {
-              if (scope.onAfterChange) {
-                scope.onAfterChange();
-              }
-              if (currentIndex != null) {
-                return scope.$apply(function () {
-                  currentIndex = currentSlide;
-                  return scope.currentIndex = currentSlide;
-                });
-              }
+              prevArrow: scope.prevArrow ? angular.element(scope.prevArrow) : void 0,
+              nextArrow: scope.nextArrow ? angular.element(scope.nextArrow) : void 0
             });
             return scope.$watch('currentIndex', function (newVal, oldVal) {
               if (currentIndex != null && newVal != null && newVal !== currentIndex) {
